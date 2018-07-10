@@ -1,43 +1,63 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const expressjwt = require('express-jwt');
-const cors = require('cors');
+const API_URL = "http://localhost:8888";
+const AUTH_URL = "http://localhost:3000";
 
-const app = express();
-const PORT = process.env.PORT || 8888;
+let ACCESS_TOKEN = undefined;
 
-app.use(bodyParser.json());
-app.use(cors());
+const headlineBtn = document.querySelector('#headline');
+const secretBtn = document.querySelector("#secret");
+const loginBtn = document.querySelector('#loginBtn');
+const logoutBtn = document.querySelector('#logoutBtn');
 
-const jwtCheck = expressjwt({
-  secret: "mysupersecretkey"
+headlineBtn.addEventListener('click', () => {
+  fetch(`${API_URL}/resource`).then(resp => {
+    return resp.text();
+  }).then( data => {
+    UIUpdate.alertBox(data);
+  });
 });
 
-app.get('/resource', (req, res) => {
-  res
-    .status(200)
-    .send('Public resource, you can see this');
+secretBtn.addEventListener('click', (event) => {
+  let headers = {};
+  if(ACCESS_TOKEN) {
+    headers = {
+      'Authorization': `Bearer ${ACCESS_TOKEN}`
+    };
+  }
+
+  fetch(`${API_URL}/resource/secret`, { headers }).then(resp => {
+    UIUpdate.updateCat(resp.status);
+    return resp.text();
+  }).then( data => {
+    UIUpdate.alertBox(data);
+  });
 });
 
-app.get('/resource/secret', jwtCheck, (req, res) => {
-  res
-    .status(200)
-    .send('Secret resource, you should be logged in to see this');
-})
-
-
-app.get('/status', (req, res) => {
-  const localTime = (new Date()).toLocaleTimeString();
-
-  res
-    .status(200)
-    .send(`Server time is ${localTime}.`);
+logoutBtn.addEventListener('click', (event) => {
+  ACCESS_TOKEN = undefined;
+  UIUpdate.loggedOut();
 });
 
-app.get('*',(req, res) => {
-  res.sendStatus(404);
+loginBtn.addEventListener('click', (event) => {
+  fetch(`${AUTH_URL}/login`, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+      'accept': 'application/json',
+    },
+    body: JSON.stringify(UIUpdate.getUsernamePassword())
+  }).then( resp => {
+    UIUpdate.updateCat(resp.status);
+    if(resp.status == 200) {
+      return resp.json();
+    } else {
+      return resp.text();
+    }
+  }).then(data => {
+    if(data.access_token) {
+      ACCESS_TOKEN = data.access_token;
+      data = `Access Token: ${data.access_token}`;
+      UIUpdate.loggedIn();
+    }
+    UIUpdate.alertBox(data);
+  });
 });
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-})
