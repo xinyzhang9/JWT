@@ -1,0 +1,30 @@
+{
+  "name": "jwt",
+  "version": "1.0.0",
+  "description": "JSON Web Token Authentication With Node",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xinyzhang9/JWT.git"
+  },
+  "keywords": [
+    "JSON",
+    "Authentication",
+    "Node"
+  ],
+  "author": "xinyzhang9@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xinyzhang9/JWT/issues"
+  },
+  "homepage": "https://github.com/xinyzhang9/JWT#readme"
+}
